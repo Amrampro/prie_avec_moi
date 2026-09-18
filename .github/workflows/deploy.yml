@@ -31,8 +31,8 @@ jobs:
           rsync -avz --delete \
             --exclude=".env" \
             --exclude="node_modules/" \
-            --exclude="uploads/" \
-            --exclude="private-audio/" \
+            --exclude="/uploads/" \
+            --exclude="/private-audio/" \
             -e "ssh -i ~/.ssh/github_prieavecmoi" \
             ./api/ \
             "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}/"
