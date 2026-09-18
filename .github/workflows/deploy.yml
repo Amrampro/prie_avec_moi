@@ -1,0 +1,53 @@
+name: Deploy Prie Avec Moi
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+
+      - name: Configurer SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/github_prieavecmoi
+          chmod 600 ~/.ssh/github_prieavecmoi
+          ssh-keyscan -H "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Tester connexion SSH
+        run: |
+          ssh -i ~/.ssh/github_prieavecmoi \
+          "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" \
+          "echo 'Connexion SSH GitHub -> Plesk OK'"
+
+      - name: Deployer API vers Plesk
+        run: |
+          rsync -avz --delete \
+            --exclude=".env" \
+            --exclude="node_modules/" \
+            --exclude="uploads/" \
+            --exclude="private-audio/" \
+            -e "ssh -i ~/.ssh/github_prieavecmoi" \
+            ./api/ \
+            "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}/"
+
+      - name: Installer dependances et Prisma
+        run: |
+          ssh -i ~/.ssh/github_prieavecmoi \
+          "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" \
+          "export PATH=/var/www/vhosts/clever-yonath.54-38-78-119.plesk.page/.nodenv/bin:/var/www/vhosts/clever-yonath.54-38-78-119.plesk.page/.nodenv/shims:\$PATH && export NODENV_VERSION=22 && cd ${{ secrets.SERVER_PATH }} && node --version && npm --version && npm ci --omit=dev && npx prisma generate && npx prisma migrate deploy"
+
+      - name: Redemarrer application
+        run: |
+          ssh -i ~/.ssh/github_prieavecmoi \
+          "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" \
+          "cd ${{ secrets.SERVER_PATH }} && mkdir -p tmp && touch tmp/restart.txt"
+
+      - name: Deployment termine
+        run: echo "Prie Avec Moi deployment completed successfully"
