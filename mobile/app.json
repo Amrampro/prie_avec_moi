@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Prie avec moi",
+    "slug": "prie-avec-moi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/appicon.png",
+    "scheme": "mobile",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.goulbam.prieavecmoi",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "Cette application vous permet de sélectionner une photo de profil pour personnaliser votre compte, par exemple afficher votre photo dans votre espace de prière."
+      }
+    },
+    "android": {
+      "icon": "./assets/images/appicon.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/appicon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.goulbam.prieavecmoi"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-splash-screen",
+      "expo-status-bar",
+      "expo-web-browser",
+      "expo-audio"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "41425341-1279-492a-864d-44dfc019737f"
+      }
+    }
+  }
+}

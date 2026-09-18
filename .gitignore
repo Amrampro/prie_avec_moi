@@ -1,0 +1,199 @@
+# ============================================================
+# PRIE AVEC MOI - .gitignore global
+# API Node/Express + Prisma + Mobile Expo/React Native
+# ============================================================
+
+
+# ------------------------------------------------------------
+# 1. NODE MODULES
+# Ignore tous les node_modules, peu importe leur emplacement
+# ------------------------------------------------------------
+node_modules/
+**/node_modules/
+
+
+# ------------------------------------------------------------
+# 2. VARIABLES D'ENVIRONNEMENT
+# Ne jamais envoyer les vrais fichiers .env
+# ------------------------------------------------------------
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Mais conserver les fichiers exemples
+!.env.example
+!**/.env.example
+
+
+# ------------------------------------------------------------
+# 3. EXPO / REACT NATIVE
+# ------------------------------------------------------------
+.expo/
+**/.expo/
+
+.expo-shared/
+**/.expo-shared/
+
+web-build/
+**/web-build/
+
+# Expo Router / Metro
+.metro-health-check*
+.metro-cache/
+**/.metro-cache/
+
+
+# ------------------------------------------------------------
+# 4. BUILDS / FICHIERS COMPILÉS
+# ------------------------------------------------------------
+dist/
+**/dist/
+
+build/
+**/build/
+
+out/
+**/out/
+
+.tmp/
+**/.tmp/
+
+tmp/
+**/tmp/
+
+.cache/
+**/.cache/
+
+
+# ------------------------------------------------------------
+# 5. TESTS / COVERAGE
+# ------------------------------------------------------------
+coverage/
+**/coverage/
+
+.nyc_output/
+**/.nyc_output/
+
+
+# ------------------------------------------------------------
+# 6. LOGS
+# ------------------------------------------------------------
+*.log
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+logs/
+**/logs/
+
+
+# ------------------------------------------------------------
+# 7. FICHIERS RUNTIME DU BACKEND
+# ------------------------------------------------------------
+
+# Fichiers uploadés par les utilisateurs
+api/uploads/*
+!api/uploads/.gitkeep
+
+# Audios privés stockés localement
+api/private-audio/*
+!api/private-audio/.gitkeep
+
+
+# ------------------------------------------------------------
+# 8. PRISMA
+# ------------------------------------------------------------
+
+# Base SQLite locale éventuelle
+*.db
+*.db-journal
+
+# IMPORTANT :
+# Ne pas ignorer prisma/
+# Les fichiers schema.prisma et migrations doivent être sur GitHub.
+
+
+# ------------------------------------------------------------
+# 9. ANDROID
+# Si Expo génère les dossiers natifs localement
+# ------------------------------------------------------------
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/android/build/
+
+*.keystore
+*.jks
+
+
+# ------------------------------------------------------------
+# 10. IOS
+# ------------------------------------------------------------
+mobile/ios/Pods/
+mobile/ios/build/
+
+*.xcuserstate
+xcuserdata/
+
+
+# ------------------------------------------------------------
+# 11. CLÉS / CERTIFICATS / SECRETS
+# ------------------------------------------------------------
+*.pem
+*.key
+*.p12
+*.p8
+*.mobileprovision
+
+google-services.json
+GoogleService-Info.plist
+
+
+# ------------------------------------------------------------
+# 12. SYSTÈME D'EXPLOITATION
+# ------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# ------------------------------------------------------------
+# 13. EDITEURS / IDE
+# ------------------------------------------------------------
+
+# JetBrains
+.idea/
+
+# VS Code :
+# je préfère conserver .vscode si tu y mets des réglages utiles au projet.
+# Si tu veux l'ignorer, décommente la ligne suivante :
+# .vscode/
+
+
+# ------------------------------------------------------------
+# 14. FICHIERS TEMPORAIRES
+# ------------------------------------------------------------
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+*~
+~$*
+
+
+# ------------------------------------------------------------
+# 15. ANCIENS FICHIERS / SAUVEGARDES
+# ------------------------------------------------------------
+mobile/yarn.lock_old
+
+
+# ------------------------------------------------------------
+# 16. EAS / EXPO CREDENTIALS LOCAUX
+# ------------------------------------------------------------
+*.keystore
+credentials.json
+credentials.local.json

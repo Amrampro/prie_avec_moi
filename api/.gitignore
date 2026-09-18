@@ -1,0 +1,10 @@
+# Ignore environment file
+.env
+private-audio/
+
+# Ignore everything inside the upload folder
+upload/**
+
+# But keep the folder itself
+# !upload/
+# !upload/.gitkeep

@@ -1,0 +1,44 @@
+api/
+  package.json
+  .env
+  prisma/
+    schema.prisma
+  src/
+    server.js
+    app.js
+    config/
+      env.js
+      prisma.js
+    middlewares/
+      auth.middleware.js
+      error.middleware.js
+    utils/
+      async.handler.js
+      jwt.js
+    modules/
+      auth/
+        auth.routes.js
+        auth.controller.js
+        auth.service.js
+      account/
+        account.routes.js
+        account.controller.js
+        account.service.js
+      series/
+        series.routes.js
+        series.controller.js
+        series.service.js
+      meditations/
+        meditation.routes.js
+        meditation.controller.js
+        meditation.service.js
+      favorites/
+        favorite.routes.js
+        favorite.controller.js
+        favorite.service.js
+
+
+npx prisma generate
+npx prisma migrate dev --name init
+npm run seed
+npm run dev
