@@ -1,38 +1,6 @@
 import { Platform } from "react-native";
-// mobile/services/uploads.api.ts
-/*import { API_BASE_URL } from "../constants/api";
-import { useAuthStore } from "../stores/auth.store";
-
-export async function apiAdminUploadFile(fileUri: string, name: string, mime: string) {
-  const token = useAuthStore.getState().token;
-
-  const form = new FormData();
-  form.append("file", {
-    uri: fileUri,
-    name,
-    type: mime,
-  } as any);
-
-  const url = `${API_BASE_URL}/admin/uploads`;
-  console.log("UPLOAD URL =>", url);
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-      // ❌ surtout pas Content-Type ici
-    },
-    body: form,
-  });
-
-  const text = await res.text();
-  if (!res.ok) throw new Error(text || `Upload failed (${res.status})`);
-
-  return JSON.parse(text);
-}
-*/
-// mobile/services/uploads.api.ts
+import { File, UploadType } from "expo-file-system";
+import { fetch } from "expo/fetch";
 import { API_BASE_URL } from "../constants/api";
 import { useAuthStore } from "../stores/auth.store";
 
@@ -43,29 +11,36 @@ export async function apiAdminUploadFile(fileUri: string, name: string, mime: st
     throw new Error("Unauthenticated");
   }
 
-  const form = new FormData();
+  const url = `${API_BASE_URL}/admin/uploads${privateAudio ? "/premium-audio" : ""}`;
+  const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
+  let status: number;
+  let raw: string;
+
   if (Platform.OS === "web") {
     const response = await fetch(fileUri);
+    if (!response.ok) throw new Error("Impossible de lire le fichier sélectionné.");
+    const form = new FormData();
     form.append("file", await response.blob(), name);
+    const res = await fetch(url, { method: "POST", headers, body: form });
+    status = res.status;
+    raw = await res.text();
   } else {
-    form.append("file", { uri: fileUri, name, type: mime } as any);
+    // Native multipart upload avoids both URI-only FormData and unsupported Blob constructors.
+    // File bytes stay on the native side, including for large audio files.
+    const file = new File(fileUri);
+    if (!file.exists) throw new Error("Le fichier sélectionné est introuvable. Sélectionne-le à nouveau.");
+    const result = await file.upload(url, {
+      httpMethod: "POST",
+      uploadType: UploadType.MULTIPART,
+      fieldName: "file",
+      mimeType: mime,
+      headers,
+      sessionType: "foreground",
+    });
+    status = result.status;
+    raw = result.body;
   }
 
-  // ✅ IMPORTANT: ton backend actuel est POST /upload
-  const url = `${API_BASE_URL}/admin/uploads${privateAudio ? "/premium-audio" : ""}`;
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-      // ❌ surtout pas Content-Type ici (boundary auto)
-    },
-    body: form,
-  });
-
-  // ✅ On lit en texte puis on tente JSON (parfois Express renvoie texte)
-  const raw = await res.text();
   let data: any = {};
   try {
     data = raw ? JSON.parse(raw) : {};
@@ -73,8 +48,12 @@ export async function apiAdminUploadFile(fileUri: string, name: string, mime: st
     data = { message: raw };
   }
 
-  if (!res.ok) {
-    throw new Error(data?.message ?? `Upload failed (${res.status})`);
+  if (status < 200 || status >= 300) {
+    throw new Error(data?.message ?? `Upload failed (${status})`);
+  }
+
+  if (!data?.file || typeof data.file.url !== "string" || !data.file.url) {
+    throw new Error("Le serveur n’a pas renvoyé l’adresse du fichier. Réessaie l’envoi.");
   }
 
   // attendu: { file: { url, filename, mimetype, size } }
