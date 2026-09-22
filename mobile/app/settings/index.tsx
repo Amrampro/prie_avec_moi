@@ -210,7 +210,7 @@ export default function SettingsScreen() {
             }}
           >
             <Text style={{ color: "#EAF0FF", fontWeight: "900", fontSize: 12 }}>
-              {isAdmin ? "Admin" : "Utilisateur"}
+              {isAdmin ? "Admin" : user?.role === "ACCOMPAGNATEUR" ? "Accompagnateur" : "Membre"}
             </Text>
           </View>
         </Pressable>
@@ -425,6 +425,12 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <View style={{ marginTop: 16, gap: 12 }}>
+          <Row icon="options-outline" label="Langue et rappels" onPress={() => router.push("/prayer/preferences" as any)} />
+          <Row icon="document-text-outline" label="Contributions et historique" onPress={() => router.push("/prayer/contributions" as any)} />
+          <Row icon="shield-checkmark-outline" label="Confidentialité" onPress={() => router.push("/prayer/privacy" as any)} />
+          {(isAdmin || user?.role === "ACCOMPAGNATEUR" || user?.role === "ADMINISTRATEUR") && <Row icon="people-outline" label="Gérer l’accompagnement" onPress={() => router.push("/prayer/team" as any)} />}
+        </View>
         {/* Logout */}
         <Pressable
           onPress={async () => {

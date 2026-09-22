@@ -4,14 +4,14 @@ import { fetch } from "expo/fetch";
 import { API_BASE_URL } from "../constants/api";
 import { useAuthStore } from "../stores/auth.store";
 
-export async function apiAdminUploadFile(fileUri: string, name: string, mime: string, privateAudio = false) {
+export async function apiAdminUploadFile(fileUri: string, name: string, mime: string, privateAudio = false, proof?: Record<string, string>, prayerProgramId?: string) {
   const token = useAuthStore.getState().token;
 
   if (!token) {
     throw new Error("Unauthenticated");
   }
 
-  const url = `${API_BASE_URL}/admin/uploads${privateAudio ? "/premium-audio" : ""}`;
+  const url = `${API_BASE_URL}/admin/uploads${proof ? "/proof" : prayerProgramId ? `/prayer-audio/${prayerProgramId}` : privateAudio ? "/premium-audio" : ""}`;
   const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
   let status: number;
   let raw: string;
@@ -20,6 +20,7 @@ export async function apiAdminUploadFile(fileUri: string, name: string, mime: st
     const response = await fetch(fileUri);
     if (!response.ok) throw new Error("Impossible de lire le fichier sélectionné.");
     const form = new FormData();
+    if (proof) for (const [key, value] of Object.entries(proof)) if (value) form.append(key, value);
     form.append("file", await response.blob(), name);
     const res = await fetch(url, { method: "POST", headers, body: form });
     status = res.status;
@@ -36,6 +37,7 @@ export async function apiAdminUploadFile(fileUri: string, name: string, mime: st
       mimeType: mime,
       headers,
       sessionType: "foreground",
+      parameters: proof,
     });
     status = result.status;
     raw = result.body;

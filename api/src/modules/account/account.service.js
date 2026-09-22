@@ -3,6 +3,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { premiumStatus } from "../premium/premium.logic.js";
 import { prisma } from "../../config/prisma.js";
+import { removeProofFiles } from "../uploads/uploads.routes.js";
 
 const updateSchema = z
   .object({
@@ -47,7 +48,7 @@ export const accountService = {
         fullName: true,
         email: true,
         avatarUrl: true,
-        premiumStartAt: true, premiumEndAt: true, isAdmin: true,
+        premiumStartAt: true, premiumEndAt: true, isAdmin: true, role: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -119,7 +120,7 @@ export const accountService = {
         fullName: true,
         email: true,
         avatarUrl: true,
-        premiumStartAt: true, premiumEndAt: true, isAdmin: true,
+        premiumStartAt: true, premiumEndAt: true, isAdmin: true, role: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -150,7 +151,9 @@ export const accountService = {
       throw err;
     }
 
+    const proofs = await prisma.contributionProof.findMany({ where: { userId }, select: { filename: true } });
     await prisma.user.delete({ where: { id: userId } });
+    await removeProofFiles(proofs.map(p => p.filename));
 
     return { ok: true };
   },

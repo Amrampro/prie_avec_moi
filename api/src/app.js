@@ -1,6 +1,7 @@
 // api/src/app.js
 
 import express from "express";
+import { prayerRoutes } from "./modules/prayer/prayer.routes.js";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -103,6 +104,7 @@ export function createApp() {
   // -------------------------------------------------------
 
   app.use("/api/premium", premiumRoutes);
+  app.use("/api/prayer", prayerRoutes);
 
   app.use("/api/auth", authRoutes);
 

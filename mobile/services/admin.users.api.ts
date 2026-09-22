@@ -7,6 +7,7 @@ export type AdminUser = {
   email: string;
   avatarUrl?: string | null;
   isAdmin: boolean;
+  role?: "MEMBRE" | "ACCOMPAGNATEUR" | "ADMINISTRATEUR";
   createdAt: string;
   updatedAt: string;
   counts?: {
@@ -39,7 +40,7 @@ export function apiAdminGetUser(id: string) {
   return apiRequest<{ user: AdminUser }>("GET", `/admin/users/${id}`, undefined, { auth: true });
 }
 
-export function apiAdminUpdateUserRole(id: string, payload: { isAdmin: boolean }) {
+export function apiAdminUpdateUserRole(id: string, payload: { isAdmin?: boolean; role?: "MEMBRE" | "ACCOMPAGNATEUR" | "ADMINISTRATEUR" }) {
   return apiRequest<{ ok: boolean; user: AdminUser }>(
     "PATCH",
     `/admin/users/${id}/role`,

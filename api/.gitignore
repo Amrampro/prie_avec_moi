@@ -1,6 +1,7 @@
 # Ignore environment file
 .env
 private-audio/
+private-uploads/
 
 # Ignore everything inside the upload folder
 upload/**

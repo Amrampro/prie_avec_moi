@@ -55,6 +55,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signOut: async () => {
+    const userId = get().user?.id;
+    set({ user: null, token: null });
+    if (userId) { const { clearPrayerCache } = await import("../services/prayer.api"); await clearPrayerCache(userId); }
     await Promise.all([
       AsyncStorage.removeItem(TOKEN_KEY),
       AsyncStorage.removeItem(USER_KEY),

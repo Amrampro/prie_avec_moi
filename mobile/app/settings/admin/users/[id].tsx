@@ -272,7 +272,7 @@ export default function AdminUserDetail() {
                         fontSize: 12,
                       }}
                     >
-                      {isAdmin ? "Admin" : "User"}
+                      {isAdmin ? "Admin" : user?.role === "ACCOMPAGNATEUR" ? "Accompagnateur" : "Membre"}
                     </Text>
                   </View>
                 </View>
@@ -334,7 +334,7 @@ export default function AdminUserDetail() {
                 >
                   Rôle :{" "}
                   <Text style={{ color: "#EAF0FF", fontWeight: "900" }}>
-                    {isAdmin ? "Administrateur" : "Utilisateur"}
+                    {isAdmin ? "Administrateur" : user?.role === "ACCOMPAGNATEUR" ? "Accompagnateur" : "Membre"}
                   </Text>
                 </Text>
 
@@ -463,6 +463,17 @@ export default function AdminUserDetail() {
                 </Text>
               </Pressable>
 
+              <Pressable
+                onPress={async () => {
+                  try {
+                    await apiAdminUpdateUserRole(id, { role: user?.role === "ACCOMPAGNATEUR" ? "MEMBRE" : "ACCOMPAGNATEUR" });
+                    await load();
+                  } catch (e: any) { Alert.alert("Erreur", e.message); }
+                }}
+                style={{ padding: 14, backgroundColor: "#214D83", borderRadius: 14 }}
+              >
+                <Text style={{ color: "#EAF0FF" }}>{user?.role === "ACCOMPAGNATEUR" ? "Passer membre" : "Passer accompagnateur"}</Text>
+              </Pressable>
               <Pressable
                 disabled
                 style={{

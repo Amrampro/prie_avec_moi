@@ -34,7 +34,7 @@ export const authService = {
         email: data.email,
         passwordHash,
       },
-      select: { id: true, fullName: true, email: true, avatarUrl: true, premiumStartAt: true, premiumEndAt: true, isAdmin: true },
+      select: { id: true, fullName: true, email: true, avatarUrl: true, premiumStartAt: true, premiumEndAt: true, isAdmin: true, role: true },
     });
 
     const token = signToken({ userId: user.id, isAdmin: user.isAdmin });
@@ -65,6 +65,7 @@ export const authService = {
       email: userDb.email,
       avatarUrl: userDb.avatarUrl,
       isAdmin: userDb.isAdmin,
+      role: userDb.role,
       ...premiumStatus(userDb),
     };
 

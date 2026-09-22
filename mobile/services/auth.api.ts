@@ -7,6 +7,7 @@ export type ApiUser = {
   email: string;
   avatarUrl?: string | null;
   isAdmin: boolean;
+  role?: "MEMBRE" | "ACCOMPAGNATEUR" | "ADMINISTRATEUR";
   isPremium?: boolean;
   premiumStartAt?: string | null;
   premiumEndAt?: string | null;

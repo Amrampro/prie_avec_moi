@@ -1,15 +1,28 @@
 // mobile/app/_layout.tsx
 import { Stack, Redirect, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { View, ActivityIndicator } from "react-native";
+import { View, ActivityIndicator, AppState } from "react-native";
 import { useAuthStore } from "../stores/auth.store";
+
+import { apiAccountMe } from "../services/account.api";
+import { syncPrayerProgress } from "../services/prayer.api";
 
 export default function RootLayout() {
   const hydrate = useAuthStore((s) => s.hydrate);
   const token = useAuthStore((s) => s.token);
+  const userId = useAuthStore((s) => s.user?.id);
   const hydrated = useAuthStore((s) => s.hydrated);
 
   const segments = useSegments();
+  useEffect(() => {
+    if (!token) return;
+    void apiAccountMe().then(({ user }) => { if (useAuthStore.getState().token === token) useAuthStore.getState().setUser(user); }).catch(() => {});
+    const sync = () => { void syncPrayerProgress(); };
+    sync();
+    const timer = setInterval(sync, 30000);
+    const listener = AppState.addEventListener("change", state => { if (state === "active") sync(); });
+    return () => { clearInterval(timer); listener.remove(); };
+  }, [token]);
 
   useEffect(() => {
     hydrate();
@@ -50,6 +63,7 @@ export default function RootLayout() {
 
   return (
     <Stack
+      key={userId || "guest"}
       screenOptions={{
         headerStyle: { backgroundColor: "#0F1A2C" },
         headerTintColor: "#EAF0FF",
@@ -71,6 +85,7 @@ export default function RootLayout() {
       {/* App */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
+      <Stack.Screen name="prayer/[section]" options={{ title: "Accompagnement" }} />
       {/* Details */}
       <Stack.Screen name="series/[slug]" options={{ title: "Série" }} />
       <Stack.Screen name="meditation/[slug]" options={{ title: "Méditation" }} />

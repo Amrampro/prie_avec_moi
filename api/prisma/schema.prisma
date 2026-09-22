@@ -14,6 +14,14 @@ model User {
   passwordHash String
   avatarUrl    String?
   isAdmin      Boolean    @default(false)
+  role         PrayerRole @default(MEMBRE)
+  prayerPreferences Json?
+  prayerRequests PrayerRequest[]
+  prayerProgress PrayerProgress[]
+  prayerAppointments PrayerAppointment[]
+  prayerNotifications PrayerNotification[]
+  contributionProofs ContributionProof[]
+  testimonies PrayerTestimony[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
@@ -28,6 +36,169 @@ model User {
   postComments PostComment[]
 
   @@map("user")
+}
+
+enum PrayerRole {
+  MEMBRE
+  ACCOMPAGNATEUR
+  ADMINISTRATEUR
+}
+
+enum PrayerRequestStatus {
+  ENVOYEE
+  EN_ETUDE
+  PRECISION_DEMANDEE
+  EN_PREPARATION
+  DISPONIBLE
+  TERMINEE
+}
+
+model PrayerRequest {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category String
+  text String @db.Text
+  country String
+  timezone String
+  followUp String
+  consentAt DateTime @default(now())
+  status PrayerRequestStatus @default(ENVOYEE)
+  companionId String?
+  clarification String? @db.Text
+  reply String? @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  programs PrayerProgram[]
+  appointments PrayerAppointment[]
+  @@index([userId, createdAt])
+  @@index([companionId, status])
+  @@map("prayer_request")
+}
+
+model PrayerProgram {
+  id String @id @default(cuid())
+  title String
+  description String? @db.Text
+  kind String @default("PUBLIC")
+  requestId String?
+  request PrayerRequest? @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  authorId String
+  published Boolean @default(false)
+  days Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  progress PrayerProgress[]
+  @@index([kind, published])
+  @@map("prayer_program")
+}
+
+model PrayerProgress {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programId String
+  program PrayerProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  steps Json
+  position String?
+  positionAt DateTime?
+  updatedAt DateTime @updatedAt
+  @@unique([userId, programId])
+  @@map("prayer_progress")
+}
+
+model PrayerSlot {
+  id String @id @default(cuid())
+  creatorId String
+  startsAt DateTime
+  duration Int
+  timezone String
+  contribution String?
+  active Boolean @default(true)
+  appointment PrayerAppointment?
+  @@index([startsAt, active])
+  @@map("prayer_slot")
+}
+
+model PrayerAppointment {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestId String @unique
+  request PrayerRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  slotId String @unique
+  slot PrayerSlot @relation(fields: [slotId], references: [id], onDelete: Restrict)
+  timezone String
+  companionId String?
+  zoomUrl String?
+  closedAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId])
+  @@index([companionId])
+  @@map("prayer_appointment")
+}
+
+model ContributionMethod {
+  id String @id @default(cuid())
+  name String
+  type String
+  holder String
+  account String
+  bank String?
+  iban String?
+  swift String?
+  currency String
+  instructions String? @db.Text
+  active Boolean @default(true)
+  displayOrder Int @default(0)
+  proofs ContributionProof[]
+  @@map("contribution_method")
+}
+
+model ContributionProof {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  methodId String?
+  method ContributionMethod? @relation(fields: [methodId], references: [id], onDelete: SetNull)
+  amount Decimal? @db.Decimal(12, 2)
+  currency String?
+  reference String?
+  filename String
+  mime String
+  status String @default("RECUE")
+  createdAt DateTime @default(now())
+  @@index([userId, createdAt])
+  @@map("contribution_proof")
+}
+
+model PrayerNotification {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type String
+  title String
+  message String @db.Text
+  resourceType String?
+  resourceId String?
+  readAt DateTime?
+  createdAt DateTime @default(now())
+  dedupeKey String @unique
+  emailSentAt DateTime?
+  emailAttempts Int @default(0)
+  @@index([userId, createdAt])
+  @@map("prayer_notification")
+}
+
+model PrayerTestimony {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  text String @db.Text
+  consent Boolean @default(false)
+  published Boolean @default(false)
+  createdAt DateTime @default(now())
+  @@map("prayer_testimony")
 }
 
 model Series {

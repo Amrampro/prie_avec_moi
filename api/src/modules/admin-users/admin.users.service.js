@@ -1,6 +1,7 @@
 // api/src/modules/admin-users/admin.users.service.js
 import { z } from "zod";
 import { prisma } from "../../config/prisma.js";
+import { removeProofFiles } from "../uploads/uploads.routes.js";
 
 function requireAuthUserId(userId) {
   if (!userId) {
@@ -12,7 +13,8 @@ function requireAuthUserId(userId) {
 }
 
 const updateRoleSchema = z.object({
-  isAdmin: z.boolean(),
+  isAdmin: z.boolean().optional(),
+  role: z.enum(["MEMBRE", "ACCOMPAGNATEUR", "ADMINISTRATEUR"]).optional(),
 });
 
 const userSelectBase = {
@@ -20,7 +22,7 @@ const userSelectBase = {
   fullName: true,
   email: true,
   avatarUrl: true,
-  isAdmin: true,
+  isAdmin: true, role: true,
   createdAt: true,
   updatedAt: true,
 };
@@ -176,6 +178,9 @@ export const adminUsersService = {
     actorUserId = requireAuthUserId(actorUserId);
 
     const data = updateRoleSchema.parse(payload);
+    if (!data.role && data.isAdmin === undefined) throw Object.assign(new Error("Rôle requis."), { statusCode: 400 });
+    data.role = data.role || (data.isAdmin ? "ADMINISTRATEUR" : "MEMBRE");
+    data.isAdmin = data.role === "ADMINISTRATEUR";
 
     const target = await prisma.user.findUnique({
       where: { id: targetUserId },
@@ -197,7 +202,7 @@ export const adminUsersService = {
 
     const updated = await prisma.user.update({
       where: { id: targetUserId },
-      data: { isAdmin: data.isAdmin },
+      data: { isAdmin: data.isAdmin, role: data.role },
       select: userSelectBase,
     });
 
@@ -229,7 +234,9 @@ export const adminUsersService = {
       throw err;
     }
 
+    const proofs = await prisma.contributionProof.findMany({ where: { userId: targetUserId }, select: { filename: true } });
     await prisma.user.delete({ where: { id: targetUserId } });
+    await removeProofFiles(proofs.map(p => p.filename));
 
     return { ok: true, deletedUserId: targetUserId };
   },

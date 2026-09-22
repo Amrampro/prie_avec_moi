@@ -1,3 +1,4 @@
+import { PrayerHome } from "../../components/PrayerScreens";
 import { PremiumBadge } from "../../components/PremiumBadge";
 // app/(tabs)/index.tsx
 import { Link, router } from "expo-router";
@@ -171,6 +172,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
       >
+        <PrayerHome />
         <Text style={{ color: "rgba(234,240,255,0.72)" }}>Aujourd’hui</Text>
         <Text
           style={{

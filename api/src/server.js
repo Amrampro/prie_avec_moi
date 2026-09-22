@@ -1,6 +1,7 @@
 // api/src/server.js
 
 import { createApp } from "./app.js";
+import { startPrayerReminders } from "./modules/prayer/prayer.notifications.js";
 import { env } from "./config/env.js";
 import { PrismaClient } from "@prisma/client";
 
@@ -12,6 +13,7 @@ async function startServer() {
     await prisma.$connect();
 
     console.log("✅ Database connected successfully");
+    startPrayerReminders();
 
     const PORT = process.env.PORT || env.port || 4000;
 

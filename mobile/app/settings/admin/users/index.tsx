@@ -254,7 +254,7 @@ export default function AdminUsersScreen() {
                       }}
                     >
                       <Text style={{ color: "#EAF0FF", fontWeight: "900", fontSize: 12 }}>
-                        {u.isAdmin ? "Admin" : "User"}
+                        {u.isAdmin ? "Admin" : u.role === "ACCOMPAGNATEUR" ? "Accompagnateur" : "Membre"}
                       </Text>
                     </View>
                   </View>

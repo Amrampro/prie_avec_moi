@@ -40,46 +40,14 @@ export default function TabsLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="series"
-        options={{
-          title: "Séries",
-          tabBarIcon: ({ color, focused, size }) => (
-            <Ionicons name={focused ? "albums" : "albums-outline"} size={size} color={color} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="feed"
-        options={{
-          title: "Actualités",
-          headerShown: false, // ✅ on mettra notre header custom sur Feed
-          tabBarIcon: ({ color, focused, size }) => (
-            <Ionicons name={focused ? "globe" : "globe-outline"} size={size} color={color} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="favorites"
-        options={{
-          title: "Favoris",
-          tabBarIcon: ({ color, focused, size }) => (
-            <Ionicons name={focused ? "heart" : "heart-outline"} size={size} color={color} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="events"
-        options={{
-          title: "Événements",
-          tabBarIcon: ({ color, focused, size }) => (
-            <Ionicons name={focused ? "calendar" : "calendar-outline"} size={size} color={color} />
-          ),
-        }}
-      />
+      <Tabs.Screen name="programs" options={{ title: "Programmes", tabBarIcon: ({ color, size }) => <Ionicons name="book-outline" color={color} size={size} /> }} />
+      <Tabs.Screen name="more" options={{ title: "Plus", tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline" color={color} size={size} /> }} />
+      <Tabs.Screen name="tracking" options={{ title: "Mon suivi", tabBarIcon: ({ color, size }) => <Ionicons name="checkmark-circle-outline" color={color} size={size} /> }} />
+      <Tabs.Screen name="account" options={{ title: "Mon compte", tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" color={color} size={size} /> }} />
+      <Tabs.Screen name="series" options={{ href: null }} />
+      <Tabs.Screen name="feed" options={{ href: null }} />
+      <Tabs.Screen name="favorites" options={{ href: null }} />
+      <Tabs.Screen name="events" options={{ href: null }} />
     </Tabs>
     
   );
